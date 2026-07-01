@@ -27,9 +27,18 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-    html, body, [class*="css"] { font-family: 'Poppins', sans-serif; }
+    :root {
+        color-scheme: light dark;
+    }
 
-    .main { background: linear-gradient(180deg, #f7f9fc 0%, #eef1f8 100%); }
+    html, body, [class*="css"] {
+        font-family: 'Poppins', sans-serif;
+        color: var(--text-color, #0f172a);
+    }
+
+    .main {
+        background: linear-gradient(180deg, var(--background-color, #f7f9fc) 0%, #eef1f8 100%);
+    }
 
     .hero {
         background: linear-gradient(120deg, #4f46e5 0%, #7c3aed 100%);
@@ -43,17 +52,18 @@ st.markdown("""
     .hero p { margin: 0.4rem 0 0 0; opacity: 0.92; font-size: 1rem; }
 
     .section-card {
-        background: white;
+        background: var(--secondary-background-color, #ffffff);
         padding: 1.4rem 1.6rem;
         border-radius: 16px;
         box-shadow: 0 4px 16px rgba(30, 41, 59, 0.06);
         margin-bottom: 1.3rem;
-        border: 1px solid #eef0f5;
+        border: 1px solid var(--border-color, #eef0f5);
+        color: var(--text-color, #0f172a);
     }
     .section-title {
         font-weight: 600;
         font-size: 1.1rem;
-        color: #1e1b4b;
+        color: var(--text-color, #1e1b4b);
         margin-bottom: 0.8rem;
         display: flex;
         align-items: center;
@@ -61,8 +71,8 @@ st.markdown("""
     }
 
     .func-badge {
-        background: #eef2ff;
-        color: #4338ca;
+        background: rgba(79, 70, 229, 0.12);
+        color: var(--text-color, #4338ca);
         padding: 0.6rem 1rem;
         border-radius: 10px;
         font-family: 'JetBrains Mono', monospace;
@@ -72,12 +82,14 @@ st.markdown("""
     }
 
     div[data-testid="stMetric"] {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background: var(--secondary-background-color, #f8fafc);
+        border: 1px solid var(--border-color, #e2e8f0);
         border-radius: 12px;
         padding: 0.8rem 1rem;
+        color: var(--text-color, #0f172a);
     }
-    div[data-testid="stMetricValue"] { font-size: 1.5rem; font-weight: 700; }
+    div[data-testid="stMetricValue"] { font-size: 1.5rem; font-weight: 700; color: var(--text-color, #0f172a); }
+    div[data-testid="stMetricLabel"] { color: var(--text-color, #334155); }
 
     .stButton>button {
         background: linear-gradient(120deg, #4f46e5, #7c3aed);
@@ -93,6 +105,7 @@ st.markdown("""
     .stButton>button:hover { transform: translateY(-2px); }
 
     div[data-testid="stDataFrame"] { font-size: 1.05rem; }
+    div[data-testid="stCaption"] { color: var(--text-color, #475569); }
 
     .status-convergen {
         background: linear-gradient(120deg, #10b981, #059669);
