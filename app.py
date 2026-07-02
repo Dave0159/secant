@@ -29,15 +29,39 @@ st.markdown("""
 
     :root {
         color-scheme: light dark;
+        --background-color: #f7f9fc;
+        --secondary-background-color: #ffffff;
+        --text-color: #0f172a;
+        --border-color: #eef0f5;
+        --muted-color: #475569;
+        --plot-gridcolor: #eef0f5;
+        --plot-line-color: #4f46e5;
+    }
+
+    /* Override for dark mode */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --background-color: #071029;
+            --secondary-background-color: #0b1220;
+            --text-color: #e6eef8;
+            --border-color: rgba(255,255,255,0.06);
+            --muted-color: #cbd5e1;
+            --plot-gridcolor: rgba(255,255,255,0.06);
+            --plot-line-color: #8b5cf6;
+        }
+        .section-card { box-shadow: 0 4px 16px rgba(2,6,23,0.6); }
+        .hero { box-shadow: 0 10px 30px rgba(79, 70, 229, 0.18); }
+        div[data-testid="stMetric"] { background: var(--secondary-background-color); border-color: var(--border-color); }
+        div[data-testid="stDataFrame"] table { background: transparent; color: var(--text-color); }
     }
 
     html, body, [class*="css"] {
         font-family: 'Poppins', sans-serif;
-        color: var(--text-color, #0f172a);
+        color: var(--text-color);
     }
 
     .main {
-        background: linear-gradient(180deg, var(--background-color, #f7f9fc) 0%, #eef1f8 100%);
+        background: linear-gradient(180deg, var(--background-color) 0%, #eef1f8 100%);
     }
 
     .hero {
@@ -52,18 +76,18 @@ st.markdown("""
     .hero p { margin: 0.4rem 0 0 0; opacity: 0.92; font-size: 1rem; }
 
     .section-card {
-        background: var(--secondary-background-color, #ffffff);
+        background: var(--secondary-background-color);
         padding: 1.4rem 1.6rem;
         border-radius: 16px;
         box-shadow: 0 4px 16px rgba(30, 41, 59, 0.06);
         margin-bottom: 1.3rem;
-        border: 1px solid var(--border-color, #eef0f5);
-        color: var(--text-color, #0f172a);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
     }
     .section-title {
         font-weight: 600;
         font-size: 1.1rem;
-        color: var(--text-color, #1e1b4b);
+        color: var(--text-color);
         margin-bottom: 0.8rem;
         display: flex;
         align-items: center;
@@ -72,7 +96,7 @@ st.markdown("""
 
     .func-badge {
         background: rgba(79, 70, 229, 0.12);
-        color: var(--text-color, #4338ca);
+        color: var(--text-color);
         padding: 0.6rem 1rem;
         border-radius: 10px;
         font-family: 'JetBrains Mono', monospace;
@@ -82,14 +106,14 @@ st.markdown("""
     }
 
     div[data-testid="stMetric"] {
-        background: var(--secondary-background-color, #f8fafc);
-        border: 1px solid var(--border-color, #e2e8f0);
+        background: var(--secondary-background-color);
+        border: 1px solid var(--border-color);
         border-radius: 12px;
         padding: 0.8rem 1rem;
-        color: var(--text-color, #0f172a);
+        color: var(--text-color);
     }
-    div[data-testid="stMetricValue"] { font-size: 1.5rem; font-weight: 700; color: var(--text-color, #0f172a); }
-    div[data-testid="stMetricLabel"] { color: var(--text-color, #334155); }
+    div[data-testid="stMetricValue"] { font-size: 1.5rem; font-weight: 700; color: var(--text-color); }
+    div[data-testid="stMetricLabel"] { color: var(--muted-color); }
 
     .stButton>button {
         background: linear-gradient(120deg, #4f46e5, #7c3aed);
@@ -105,7 +129,7 @@ st.markdown("""
     .stButton>button:hover { transform: translateY(-2px); }
 
     div[data-testid="stDataFrame"] { font-size: 1.05rem; }
-    div[data-testid="stCaption"] { color: var(--text-color, #475569); }
+    div[data-testid="stCaption"] { color: var(--muted-color); }
 
     .status-convergen {
         background: linear-gradient(120deg, #10b981, #059669);
