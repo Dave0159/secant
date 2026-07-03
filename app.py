@@ -503,11 +503,7 @@ if run:
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
     fig2.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[x_min, x_max])
-    if auto_zoom:
-        y_lo2, y_hi2 = compute_y_range(y_vals, extra_points=iter_y)
-        fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_lo2, y_hi2])
-    else:
-        fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
+    fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
     st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": True})
 
     st.markdown('</div>', unsafe_allow_html=True)
