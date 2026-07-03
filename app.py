@@ -263,11 +263,6 @@ with col_params:
         st.error("Batas bawah Y harus lebih kecil dari batas atas Y.")
         st.stop()
 
-    auto_zoom = st.checkbox(
-        "🔍 Zoom otomatis ke area akar (opsional, berguna untuk fungsi yang sangat curam/eksponensial)",
-        value=False,
-        help="Jika dimatikan, grafik memakai rentang X/Y persis seperti yang kamu atur di atas — sama seperti kalkulator grafik pada umumnya (mis. Desmos)."
-    )
 
     st.markdown("**Tebakan awal & parameter**")
     p1, p2 = st.columns(2)
