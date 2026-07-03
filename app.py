@@ -425,18 +425,21 @@ st.markdown('<div class="section-title">2. Grafik & Parameter Iterasi</div>', un
 col_graph, col_params = st.columns([1.1, 1], gap="large")
 
 with col_params:
-    st.markdown("**Rentang sumbu-x**")
+    st.markdown("**Rentang sumbu**")
     r1, r2 = st.columns(2)
     with r1:
         x_min = st.number_input("Batas bawah X", value=-10.0, step=1.0)
+        y_min = st.number_input("Batas bawah Y", value=-10.0, step=1.0)
     with r2:
         x_max = st.number_input("Batas atas X", value=10.0, step=1.0)
+        y_max = st.number_input("Batas atas Y", value=10.0, step=1.0)
 
     if x_min >= x_max:
         st.error("Batas bawah X harus lebih kecil dari batas atas X.")
         st.stop()
-
-    st.caption("📐 Sumbu-y menyesuaikan otomatis mengikuti bentuk kurva pada rentang X di atas.")
+    if y_min >= y_max:
+        st.error("Batas bawah Y harus lebih kecil dari batas atas Y.")
+        st.stop()
 
     st.markdown("**Tebakan awal & parameter**")
     p1, p2 = st.columns(2)
@@ -486,9 +489,8 @@ with col_graph:
         hovermode="x unified",
         font=dict(family="Poppins, sans-serif", size=11),
     )
-    y_lo, y_hi = compute_y_range(y_vals)
     fig.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[x_min, x_max])
-    fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_lo, y_hi])
+    fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
     st.caption("💡 Sentuh/hover pada garis untuk lihat koordinat (x, f(x)). Gunakan grafik ini untuk memperkirakan x₀ dan x₁ yang dekat dengan akar.")
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": True})
 
@@ -723,9 +725,8 @@ if run:
                    for k in range(2, n_frames + 1)],
         )] if n_frames > 2 else [],
     )
-    y_lo2, y_hi2 = compute_y_range(y_vals, extra_points=iter_y)
     fig2.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[x_min, x_max])
-    fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_lo2, y_hi2])
+    fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
     st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": True})
 
     st.markdown('</div>', unsafe_allow_html=True)
