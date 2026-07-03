@@ -227,17 +227,24 @@ with col_params:
     p1, p2 = st.columns(2)
     with p1:
         x0 = st.number_input("x₀", value=1.0, format="%.6f")
-        tol = st.number_input("Toleransi error", value=1e-6, format="%.10f")
+        tol = st.number_input("Toleransi error |x(i+1) - x(i)|", value=1e-6, format="%.10f")
     with p2:
         x1 = st.number_input("x₁", value=2.0, format="%.6f")
         max_iter = st.number_input("Maks. iterasi", value=50, min_value=1, step=1)
+
+    f_tol = st.number_input(
+        "Toleransi |f(x)| (memastikan hasil benar-benar dekat ke akar, bukan sekadar x berhenti bergerak)",
+        value=1e-4, format="%.10f"
+    )
 
     run = st.button(" ▷ Jalankan Metode Secant", type="primary", use_container_width=True)
 
 x_vals = np.linspace(x_min, x_max, 1000)
 try:
-    y_vals = f(x_vals)
+    with np.errstate(all="ignore"):
+        y_vals = f(x_vals)
     y_vals = np.array(y_vals, dtype=float)
+    y_vals[~np.isfinite(y_vals)] = np.nan  # titik overflow tidak digambar, bukan error
 except Exception as e:
     st.error(f"❌ Gagal menghitung nilai fungsi: {e}")
     st.stop()
@@ -274,14 +281,33 @@ st.markdown('</div>', unsafe_allow_html=True)
 # ---------------------------------------------------------
 # 3. PROSES METODE SECANT
 # ---------------------------------------------------------
-def secant_method(f, x0, x1, tol, max_iter):
+def secant_method(f, x0, x1, tol, max_iter, f_tol=1e-4):
+    """
+    Catatan penting soal exponential/fungsi curam:
+    Jika hanya memakai |x(i+1) - x(i)| < tol sebagai syarat konvergen, fungsi
+    yang naik sangat curam (mis. exp(x)) bisa membuat x "berhenti bergerak"
+    (karena turunannya sangat besar) padahal f(x) masih jauh dari nol -> ini
+    yang membuat program dulu SALAH melaporkan "konvergen" walau sebenarnya
+    tidak ada akar di sekitar situ. Perbaikannya: syarat konvergen sekarang
+    butuh KEDUANYA -> |x(i+1)-x(i)| < tol  DAN  |f(x(i+1))| < f_tol.
+    Selain itu, jika hasil hitung meledak jadi inf/NaN (overflow khas fungsi
+    eksponensial), iterasi langsung dihentikan dan dilaporkan tidak konvergen.
+    """
     rows = []
     is_convergen = False
     root = None
+    stop_reason = None
 
-    x_prev, x_curr = x0, x1
-    f_prev = f(x_prev)
-    f_curr = f(x_curr)
+    x_prev, x_curr = float(x0), float(x1)
+    with np.errstate(all="ignore"):
+        f_prev = float(f(x_prev))
+        f_curr = float(f(x_curr))
+
+    if not (np.isfinite(f_prev) and np.isfinite(f_curr)):
+        return [], False, None, (
+            "f(x₀) atau f(x₁) tidak terdefinisi/tak hingga (overflow). "
+            "Coba x₀/x₁ yang lain, lebih dekat ke sumbu-x pada grafik."
+        )
 
     for i in range(1, int(max_iter) + 1):
         denom = (f_curr - f_prev)
@@ -292,10 +318,27 @@ def secant_method(f, x0, x1, tol, max_iter):
                 "x(i+1)": None, "Error": None,
                 "Keterangan": "Berhenti: pembagi nol"
             })
+            stop_reason = "Pembagi nol: f(x(i)) - f(x(i-1)) = 0 sehingga iterasi tidak bisa dilanjutkan."
             break
 
-        x_next = x_curr - f_curr * (x_curr - x_prev) / denom
-        f_next = f(x_next)
+        with np.errstate(all="ignore"):
+            x_next = x_curr - f_curr * (x_curr - x_prev) / denom
+            f_next = float(f(x_next)) if np.isfinite(x_next) else float("nan")
+
+        # Deteksi overflow/NaN (khas fungsi eksponensial yang meledak)
+        if not (np.isfinite(x_next) and np.isfinite(f_next)):
+            rows.append({
+                "Iterasi": i, "x(i-1)": x_prev, "x(i)": x_curr,
+                "f(x(i-1))": f_prev, "f(x(i))": f_curr,
+                "x(i+1)": None, "Error": None,
+                "Keterangan": "Berhenti: nilai meledak ke tak hingga (overflow)"
+            })
+            stop_reason = (
+                "Nilai x atau f(x) meledak ke tak hingga (overflow) — fungsi kemungkinan "
+                "tidak memiliki akar real di arah pencarian ini."
+            )
+            break
+
         error = abs(x_next - x_curr)
 
         rows.append({
@@ -309,7 +352,10 @@ def secant_method(f, x0, x1, tol, max_iter):
             "Keterangan": "OK"
         })
 
-        if error < tol:
+        # Konvergen HANYA jika x sudah stabil DAN f(x) benar-benar dekat nol.
+        # Ini mencegah "konvergen palsu" saat x berhenti bergerak akibat
+        # turunan fungsi yang sangat curam (mis. exp(x)) padahal f(x) masih besar.
+        if error < tol and abs(f_next) < f_tol:
             is_convergen = True
             root = x_next
             break
@@ -321,17 +367,26 @@ def secant_method(f, x0, x1, tol, max_iter):
         last = rows[-1]
         if last["x(i+1)"] is not None:
             root = last["x(i+1)"]
+            if stop_reason is None:
+                stop_reason = (
+                    f"Toleransi belum tercapai hingga {max_iter} iterasi "
+                    f"(|f(x)| terakhir ≈ {abs(f_curr):.6g}, belum di bawah {f_tol})."
+                )
 
-    return rows, is_convergen, root
+    return rows, is_convergen, root, stop_reason
 
 if run:
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">3. Hasil Iterasi</div>', unsafe_allow_html=True)
 
     try:
-        rows, is_convergen, root = secant_method(f, x0, x1, tol, int(max_iter))
+        rows, is_convergen, root, stop_reason = secant_method(f, x0, x1, tol, int(max_iter), f_tol)
     except Exception as e:
         st.error(f"❌ Terjadi error saat menjalankan iterasi: {e}")
+        st.stop()
+
+    if not rows and root is None and stop_reason:
+        st.error(f"❌ Tidak dapat memulai iterasi: {stop_reason}")
         st.stop()
 
     jumlah_iterasi = len(rows)
@@ -351,9 +406,10 @@ if run:
             unsafe_allow_html=True
         )
     else:
+        alasan = f" Sebab: {stop_reason}" if stop_reason else ""
         st.markdown(
             f'<div class="status-divergen">❌ Metode secant TIDAK KONVERGEN dalam {jumlah_iterasi} iterasi '
-            f'(maksimum {max_iter}) dengan toleransi {tol}. Coba ubah x₀/x₁ berdasarkan grafik, '
+            f'(maksimum {max_iter}).{alasan} Coba ubah x₀/x₁ berdasarkan grafik, '
             f'atau perbesar jumlah maksimum iterasi.</div>',
             unsafe_allow_html=True
         )
