@@ -247,20 +247,26 @@ st.markdown('<div class="section-title">2. Grafik & Parameter Iterasi</div>', un
 col_graph, col_params = st.columns([1.1, 1], gap="large")
 
 with col_params:
-    st.markdown("**Rentang sumbu-x**")
+    st.markdown("**Rentang sumbu (seperti kalkulator grafik)**")
     r1, r2 = st.columns(2)
     with r1:
-        x_min = st.number_input("Batas bawah", value=-10.0, step=1.0)
+        x_min = st.number_input("Batas bawah X", value=-10.0, step=1.0)
+        y_min = st.number_input("Batas bawah Y", value=-10.0, step=1.0)
     with r2:
-        x_max = st.number_input("Batas atas", value=10.0, step=1.0)
+        x_max = st.number_input("Batas atas X", value=10.0, step=1.0)
+        y_max = st.number_input("Batas atas Y", value=10.0, step=1.0)
 
     if x_min >= x_max:
-        st.error("Batas bawah harus lebih kecil dari batas atas.")
+        st.error("Batas bawah X harus lebih kecil dari batas atas X.")
+        st.stop()
+    if y_min >= y_max:
+        st.error("Batas bawah Y harus lebih kecil dari batas atas Y.")
         st.stop()
 
     auto_zoom = st.checkbox(
-        "🔍 Fokus otomatis ke area akar (disarankan untuk fungsi curam/eksponensial)",
-        value=True
+        "🔍 Zoom otomatis ke area akar (opsional, berguna untuk fungsi yang sangat curam/eksponensial)",
+        value=False,
+        help="Jika dimatikan, grafik memakai rentang X/Y persis seperti yang kamu atur di atas — sama seperti kalkulator grafik pada umumnya (mis. Desmos)."
     )
 
     st.markdown("**Tebakan awal & parameter**")
@@ -311,13 +317,13 @@ with col_graph:
         hovermode="x unified",
         font=dict(family="Poppins, sans-serif", size=11),
     )
-    fig.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
+    fig.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[x_min, x_max])
     if auto_zoom:
         y_lo, y_hi = compute_y_range(y_vals)
         fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_lo, y_hi])
-        st.caption("💡 Sentuh/hover pada garis untuk lihat koordinat. Sumbu-y sedang di-zoom otomatis ke area akar — matikan kotak centang di atas untuk lihat skala penuh.")
+        st.caption("💡 Sentuh/hover pada garis untuk lihat koordinat. Sumbu-y sedang di-zoom otomatis ke area akar — matikan kotak centang di atas untuk pakai rentang Y manual.")
     else:
-        fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
+        fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
         st.caption("💡 Sentuh/hover pada garis untuk lihat koordinat (x, f(x)). Gunakan grafik ini untuk memperkirakan x₀ dan x₁ yang dekat dengan akar.")
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": True})
 
@@ -506,12 +512,12 @@ if run:
         font=dict(family="Poppins, sans-serif", size=12),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
-    fig2.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
+    fig2.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[x_min, x_max])
     if auto_zoom:
         y_lo2, y_hi2 = compute_y_range(y_vals, extra_points=iter_y)
         fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_lo2, y_hi2])
     else:
-        fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
+        fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
     st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": True})
 
     st.markdown('</div>', unsafe_allow_html=True)
