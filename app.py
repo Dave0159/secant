@@ -203,6 +203,41 @@ if err:
 st.markdown(f'<div class="func-badge">f(x) = {sp.simplify(expr)}</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
+def compute_y_range(y_vals, extra_points=None, pad_frac=0.12):
+    """
+    Menentukan rentang sumbu-y yang enak dibaca.
+    Fungsi curam seperti exp(x) bisa punya nilai yang meledak jauh di salah
+    satu ujung range-x (mis. exp(10) ≈ 22000), sehingga auto-scale biasa
+    membuat area di sekitar akar (yang nilainya kecil) jadi gepeng/tak
+    terlihat. Di sini dipakai median + MAD (median absolute deviation) yang
+    jauh lebih tahan terhadap nilai ekstrem dibanding min/max biasa.
+    """
+    finite = y_vals[np.isfinite(y_vals)]
+    if finite.size == 0:
+        return (-10.0, 10.0)
+
+    actual_min, actual_max = float(np.min(finite)), float(np.max(finite))
+    med = float(np.median(finite))
+    mad = float(np.median(np.abs(finite - med))) * 1.4826  # skala setara std normal
+
+    if mad < 1e-9:
+        lo, hi = actual_min, actual_max
+    else:
+        lo = max(actual_min, med - 6 * mad)
+        hi = min(actual_max, med + 6 * mad)
+
+    if extra_points:
+        ep = [float(v) for v in extra_points if np.isfinite(v)]
+        if ep:
+            lo = min(lo, min(ep))
+            hi = max(hi, max(ep))
+
+    if hi - lo < 1e-9:
+        lo, hi = lo - 1, hi + 1
+
+    pad = (hi - lo) * pad_frac
+    return (lo - pad, hi + pad)
+
 # ---------------------------------------------------------
 # 2. GRAFIK + PARAMETER (berdampingan, grafik lebih kecil)
 # ---------------------------------------------------------
@@ -222,6 +257,11 @@ with col_params:
     if x_min >= x_max:
         st.error("Batas bawah harus lebih kecil dari batas atas.")
         st.stop()
+
+    auto_zoom = st.checkbox(
+        "🔍 Fokus otomatis ke area akar (disarankan untuk fungsi curam/eksponensial)",
+        value=True
+    )
 
     st.markdown("**Tebakan awal & parameter**")
     p1, p2 = st.columns(2)
@@ -272,9 +312,14 @@ with col_graph:
         font=dict(family="Poppins, sans-serif", size=11),
     )
     fig.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
-    fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-    st.caption("💡 Sentuh atau arahkan kursor pada garis untuk melihat koordinat (x, f(x)). Gunakan ini untuk memperkirakan x₀ dan x₁ yang dekat dengan akar.")
+    if auto_zoom:
+        y_lo, y_hi = compute_y_range(y_vals)
+        fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_lo, y_hi])
+        st.caption("💡 Sentuh/hover pada garis untuk lihat koordinat. Sumbu-y sedang di-zoom otomatis ke area akar — matikan kotak centang di atas untuk lihat skala penuh.")
+    else:
+        fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
+        st.caption("💡 Sentuh/hover pada garis untuk lihat koordinat (x, f(x)). Gunakan grafik ini untuk memperkirakan x₀ dan x₁ yang dekat dengan akar.")
+    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": True})
 
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -462,8 +507,12 @@ if run:
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
     fig2.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
-    fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
-    st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
+    if auto_zoom:
+        y_lo2, y_hi2 = compute_y_range(y_vals, extra_points=iter_y)
+        fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_lo2, y_hi2])
+    else:
+        fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False)
+    st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": True})
 
     st.markdown('</div>', unsafe_allow_html=True)
 
