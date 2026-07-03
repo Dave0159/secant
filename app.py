@@ -143,8 +143,186 @@ st.markdown("""
         font-weight: 600; font-size: 1.05rem;
         box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
     }
+
+    /* ---------------- ANIMASI ---------------- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+    @keyframes gradientShift {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    @keyframes floatY {
+        0%, 100% { transform: translateY(0px); }
+        50%      { transform: translateY(-8px); }
+    }
+    @keyframes pulseGlow {
+        0%, 100% { box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3); }
+        50%      { box-shadow: 0 10px 28px rgba(124, 58, 237, 0.55); }
+    }
+
+    .hero {
+        background-size: 200% 200%;
+        animation: fadeInUp 0.7s ease-out both, gradientShift 10s ease infinite;
+    }
+
+    .section-card {
+        animation: fadeInUp 0.6s ease-out both;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .section-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 26px rgba(30, 41, 59, 0.12);
+    }
+    div[data-testid="stVerticalBlock"] > div:has(> div.section-card):nth-of-type(1) .section-card { animation-delay: 0.05s; }
+    div[data-testid="stVerticalBlock"] > div:has(> div.section-card):nth-of-type(2) .section-card { animation-delay: 0.15s; }
+    div[data-testid="stVerticalBlock"] > div:has(> div.section-card):nth-of-type(3) .section-card { animation-delay: 0.25s; }
+
+    .func-badge { animation: fadeIn 0.5s ease-out both; }
+
+    div[data-testid="stMetric"] {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        animation: fadeInUp 0.5s ease-out both;
+    }
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+    }
+
+    .stButton>button {
+        animation: pulseGlow 2.5s ease-in-out infinite;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px) scale(1.02);
+        animation: none;
+        box-shadow: 0 10px 24px rgba(79, 70, 229, 0.45);
+    }
+    .stButton>button:active { transform: translateY(0) scale(0.98); }
+
+    .status-convergen, .status-divergen { animation: fadeInUp 0.5s ease-out both; }
+
+    div[data-testid="stDataFrame"] { animation: fadeIn 0.6s ease-out both; }
+
+    /* ---------------- LANDING PAGE ---------------- */
+    .landing-hero {
+        background: linear-gradient(120deg, #4f46e5 0%, #7c3aed 50%, #6366f1 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite;
+        border-radius: 24px;
+        padding: 3.5rem 2.5rem;
+        text-align: center;
+        color: white;
+        box-shadow: 0 16px 40px rgba(79, 70, 229, 0.3);
+        margin-bottom: 1.8rem;
+    }
+    .landing-hero .badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.18);
+        padding: 0.35rem 1rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        animation: floatY 3s ease-in-out infinite;
+    }
+    .landing-hero h1 {
+        font-size: 2.6rem;
+        font-weight: 700;
+        margin: 0.4rem 0;
+        animation: fadeInUp 0.8s ease-out both;
+    }
+    .landing-hero p {
+        font-size: 1.1rem;
+        opacity: 0.92;
+        max-width: 640px;
+        margin: 0.8rem auto 0 auto;
+        animation: fadeInUp 0.9s ease-out both;
+    }
+    .feature-card {
+        background: var(--secondary-background-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.5rem 1.3rem;
+        text-align: center;
+        height: 100%;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        animation: fadeInUp 0.7s ease-out both;
+        color: var(--text-color);
+    }
+    .feature-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 30px rgba(79, 70, 229, 0.18);
+    }
+    .feature-card .icon { font-size: 2.2rem; margin-bottom: 0.6rem; animation: floatY 3s ease-in-out infinite; }
+    .feature-card h4 { margin: 0.3rem 0; font-size: 1.05rem; }
+    .feature-card p { margin: 0; font-size: 0.9rem; color: var(--muted-color); }
 </style>
 """, unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# LANDING PAGE (tampil sebelum masuk ke kalkulator)
+# ---------------------------------------------------------
+if "started" not in st.session_state:
+    st.session_state.started = False
+
+if not st.session_state.started:
+    st.markdown("""
+    <div class="landing-hero">
+        <div class="badge">📐 Metode Numerik &middot; Pencarian Akar</div>
+        <h1>Kalkulator Metode Secant</h1>
+        <p>Masukkan persamaan f(x) = 0, lihat grafiknya secara interaktif, tentukan tebakan awal x₀ dan x₁,
+        lalu lihat prosesnya konvergen menuju akar — lengkap dengan tabel iterasi dan visualisasi langkah demi langkah.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    fc1, fc2, fc3 = st.columns(3, gap="medium")
+    with fc1:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="icon">📈</div>
+            <h4>Grafik Interaktif</h4>
+            <p>Sentuh atau hover untuk melihat koordinat, sumbu-y menyesuaikan otomatis mengikuti bentuk kurva.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with fc2:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="icon">🧮</div>
+            <h4>Iterasi Transparan</h4>
+            <p>Setiap langkah metode secant ditampilkan lengkap: x, f(x), error, hingga status konvergen.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with fc3:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="icon">✅</div>
+            <h4>Deteksi Konvergensi Akurat</h4>
+            <p>Kriteria ganda (Δx dan f(x)) plus deteksi overflow, jadi hasil tidak salah "terbaca konvergen".</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.write("")
+    col_cta = st.columns([1, 1.2, 1])[1]
+    with col_cta:
+        if st.button("🚀 Mulai Menghitung", type="primary", use_container_width=True):
+            st.session_state.started = True
+            st.rerun()
+
+    st.stop()
+
+st.markdown("""
+<div style="text-align:right; margin-bottom:0.5rem;">
+""", unsafe_allow_html=True)
+if st.button("← Kembali ke halaman awal"):
+    st.session_state.started = False
+    st.rerun()
+st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="hero">
@@ -247,22 +425,18 @@ st.markdown('<div class="section-title">2. Grafik & Parameter Iterasi</div>', un
 col_graph, col_params = st.columns([1.1, 1], gap="large")
 
 with col_params:
-    st.markdown("**Rentang sumbu (seperti kalkulator grafik)**")
+    st.markdown("**Rentang sumbu-x**")
     r1, r2 = st.columns(2)
     with r1:
         x_min = st.number_input("Batas bawah X", value=-10.0, step=1.0)
-        y_min = st.number_input("Batas bawah Y", value=-10.0, step=1.0)
     with r2:
         x_max = st.number_input("Batas atas X", value=10.0, step=1.0)
-        y_max = st.number_input("Batas atas Y", value=10.0, step=1.0)
 
     if x_min >= x_max:
         st.error("Batas bawah X harus lebih kecil dari batas atas X.")
         st.stop()
-    if y_min >= y_max:
-        st.error("Batas bawah Y harus lebih kecil dari batas atas Y.")
-        st.stop()
 
+    st.caption("📐 Sumbu-y menyesuaikan otomatis mengikuti bentuk kurva pada rentang X di atas.")
 
     st.markdown("**Tebakan awal & parameter**")
     p1, p2 = st.columns(2)
@@ -312,8 +486,9 @@ with col_graph:
         hovermode="x unified",
         font=dict(family="Poppins, sans-serif", size=11),
     )
+    y_lo, y_hi = compute_y_range(y_vals)
     fig.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[x_min, x_max])
-    fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
+    fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_lo, y_hi])
     st.caption("💡 Sentuh/hover pada garis untuk lihat koordinat (x, f(x)). Gunakan grafik ini untuk memperkirakan x₀ dan x₁ yang dekat dengan akar.")
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": True})
 
@@ -421,7 +596,8 @@ if run:
     st.markdown('<div class="section-title">3. Hasil Iterasi</div>', unsafe_allow_html=True)
 
     try:
-        rows, is_convergen, root, stop_reason = secant_method(f, x0, x1, tol, int(max_iter), f_tol)
+        with st.spinner("🔄 Menjalankan iterasi metode secant..."):
+            rows, is_convergen, root, stop_reason = secant_method(f, x0, x1, tol, int(max_iter), f_tol)
     except Exception as e:
         st.error(f"❌ Terjadi error saat menjalankan iterasi: {e}")
         st.stop()
@@ -465,6 +641,7 @@ if run:
     iter_x = [x0, x1] + [r["x(i+1)"] for r in rows if r["x(i+1)"] is not None]
     iter_y = [float(f(v)) for v in iter_x]
     iter_labels = ["x₀", "x₁"] + [f"x{i+2}" for i in range(len(iter_x) - 2)]
+    n_frames = len(iter_x)
 
     fig2 = go.Figure()
     fig2.add_hline(y=0, line_color="#94a3b8", line_width=1)
@@ -475,12 +652,14 @@ if run:
         line=dict(color="#4f46e5", width=2.5),
         hovertemplate="x = %{x:.4f}<br>f(x) = %{y:.4f}<extra></extra>",
     ))
+    # Trace ini yang dianimasikan (mulai dari 2 titik pertama saja: x0, x1)
+    start_k = min(2, n_frames)
     fig2.add_trace(go.Scatter(
-        x=iter_x, y=iter_y,
+        x=iter_x[:start_k], y=iter_y[:start_k],
         mode="lines+markers", name="Titik iterasi",
         line=dict(color="#f59e0b", width=1.8, dash="dash"),
         marker=dict(size=9, color="#f59e0b", line=dict(width=1, color="white")),
-        text=iter_labels,
+        text=iter_labels[:start_k],
         hovertemplate="%{text}<br>x = %{x:.6f}<br>f(x) = %{y:.6f}<extra></extra>",
     ))
     if root is not None:
@@ -490,8 +669,27 @@ if run:
             marker=dict(size=16, color="#ef4444", symbol="star", line=dict(width=1, color="white")),
             hovertemplate=f"Akar<br>x = {root:.6f}<br>f(x) = {float(f(root)):.6e}<extra></extra>",
         ))
+
+    # Frame animasi: titik iterasi bertambah satu per satu
+    frames = [
+        go.Frame(
+            data=[go.Scatter(
+                x=iter_x[:k], y=iter_y[:k],
+                mode="lines+markers",
+                line=dict(color="#f59e0b", width=1.8, dash="dash"),
+                marker=dict(size=9, color="#f59e0b", line=dict(width=1, color="white")),
+                text=iter_labels[:k],
+                hovertemplate="%{text}<br>x = %{x:.6f}<br>f(x) = %{y:.6f}<extra></extra>",
+            )],
+            traces=[1],
+            name=str(k),
+        )
+        for k in range(2, n_frames + 1)
+    ]
+    fig2.frames = frames
+
     fig2.update_layout(
-        title=dict(text="Konvergensi Metode Secant Menuju Akar — sentuh titik untuk lihat koordinat",
+        title=dict(text="Konvergensi Metode Secant Menuju Akar — tekan ▶ untuk animasi, atau sentuh titik untuk koordinat",
                     font=dict(size=13, color="#1e1b4b")),
         xaxis_title="x",
         yaxis_title="f(x)",
@@ -501,9 +699,33 @@ if run:
         paper_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Poppins, sans-serif", size=12),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        updatemenus=[dict(
+            type="buttons",
+            direction="left",
+            x=0.0, y=1.16, xanchor="left", yanchor="top",
+            showactive=False,
+            buttons=[
+                dict(label="▶ Animasikan", method="animate",
+                     args=[None, dict(frame=dict(duration=600, redraw=True), fromcurrent=True, transition=dict(duration=200))]),
+                dict(label="⏸ Jeda", method="animate",
+                     args=[[None], dict(frame=dict(duration=0, redraw=False), mode="immediate")]),
+                dict(label="↺ Ulang", method="animate",
+                     args=[[str(k) for k in range(2, n_frames + 1)],
+                           dict(frame=dict(duration=600, redraw=True), fromcurrent=False, transition=dict(duration=200))]),
+            ],
+        )],
+        sliders=[dict(
+            active=0,
+            x=0.0, y=-0.12, len=1.0,
+            currentvalue=dict(prefix="Iterasi ke: ", font=dict(size=11)),
+            steps=[dict(method="animate", label=str(k - 1),
+                        args=[[str(k)], dict(frame=dict(duration=0, redraw=True), mode="immediate")])
+                   for k in range(2, n_frames + 1)],
+        )] if n_frames > 2 else [],
     )
+    y_lo2, y_hi2 = compute_y_range(y_vals, extra_points=iter_y)
     fig2.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[x_min, x_max])
-    fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
+    fig2.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_lo2, y_hi2])
     st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": True})
 
     st.markdown('</div>', unsafe_allow_html=True)
