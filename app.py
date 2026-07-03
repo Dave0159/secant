@@ -313,8 +313,8 @@ with col_graph:
         font=dict(family="Poppins, sans-serif", size=11),
     )
     fig.update_xaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[x_min, x_max])
-        fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
-        st.caption("💡 Sentuh/hover pada garis untuk lihat koordinat (x, f(x)). Gunakan grafik ini untuk memperkirakan x₀ dan x₁ yang dekat dengan akar.")
+    fig.update_yaxes(showgrid=True, gridcolor="#eef0f5", zeroline=False, range=[y_min, y_max])
+    st.caption("💡 Sentuh/hover pada garis untuk lihat koordinat (x, f(x)). Gunakan grafik ini untuk memperkirakan x₀ dan x₁ yang dekat dengan akar.")
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": True})
 
 st.markdown('</div>', unsafe_allow_html=True)
